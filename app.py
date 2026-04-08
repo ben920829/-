@@ -47,7 +47,7 @@ if not st.session_state.answered:
 
 # 公布答案後顯示影片
 if st.session_state.answered:
-    st.video(song["url"], start_time=0)
+    st.video(song["url"], start_time=1)
 
 # ====== 提示 ======
 if st.button("💡 顯示提示"):

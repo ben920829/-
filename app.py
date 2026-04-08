@@ -13,7 +13,7 @@ default_songs = [
     },
     {
         "title": "unravel",
-        "url": "https://www.youtube.com/watch?v=Fve_lHIPa-I",
+        "url": "https://youtu.be/gUmO7_kOP0w?si=RZ1Z6jy1-i2Qj8d_",
         "hint": "東京喰種 OP"
     },
     {

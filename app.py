@@ -21,7 +21,7 @@ songs = load_songs()
 if not songs:
     st.stop()
 
-# ====== 初始化 ======
+# ====== 初始化狀態 ======
 if "used_indices" not in st.session_state:
     st.session_state.used_indices = []
 
@@ -41,20 +41,39 @@ song = songs[st.session_state.current_index]
 st.title("🎵 猜歌挑戰")
 st.write(f"第 {st.session_state.question_count} 題")
 
-# ====== 按鍵播放音樂（影片畫面隱藏） ======
+# ====== 盲猜階段按鈕控制播放 ======
 if not st.session_state.answered:
-    play_btn = st.button("▶️ 播放音樂")
-    if play_btn:
-        # 使用 HTML iframe 嵌入 YouTube，隱藏畫面但可播放聲音
-        video_id = song["url"].split("v=")[-1]  # 取得 YouTube ID
-        youtube_embed = f"""
-        <iframe width="1" height="1"
-        src="https://www.youtube.com/embed/{video_id}?autoplay=1&controls=0&mute=0"
-        frameborder="0"
-        allow="autoplay; encrypted-media"
-        allowfullscreen></iframe>
-        """
-        st.components.v1.html(youtube_embed, height=1)
+    st.write("🎧 盲猜階段：影片畫面隱藏，請用按鈕控制播放")
+    
+    play = st.button("▶️ 播放")
+    pause = st.button("⏸ 暫停")
+    
+    video_id = song["url"].split("v=")[-1]
+    
+    # 使用 HTML iframe + YouTube IFrame API 控制播放
+    # 高度和寬度設定小，畫面幾乎看不到
+    iframe_html = f"""
+    <div id="player"></div>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+      var player;
+      function onYouTubeIframeAPIReady() {{
+        player = new YT.Player('player', {{
+          height: '1',
+          width: '1',
+          videoId: '{video_id}',
+          events: {{
+            'onReady': onPlayerReady
+          }}
+        }});
+      }}
+      function onPlayerReady(event) {{
+        { 'player.playVideo();' if play else '' }
+        { 'player.pauseVideo();' if pause else '' }
+      }}
+    </script>
+    """
+    st.components.v1.html(iframe_html, height=50)
 
 # ====== 公布答案後顯示影片 ======
 if st.session_state.answered:

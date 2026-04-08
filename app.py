@@ -22,7 +22,7 @@ songs = load_songs()
 if not songs:
     st.stop()
 
-# ====== 初始化狀態 ======
+# ====== 初始化 ======
 if "used_indices" not in st.session_state:
     st.session_state.used_indices = []
 
@@ -36,25 +36,34 @@ if "question_count" not in st.session_state:
 if "answered" not in st.session_state:
     st.session_state.answered = False
 
+song = songs[st.session_state.current_index]
+
 # ====== UI ======
 st.title("🎵 猜歌挑戰")
 st.write(f"第 {st.session_state.question_count} 題")
 
-song = songs[st.session_state.current_index]
+# 🎧 提示玩家（因為沒有畫面）
+st.info("🎧 正在播放音樂，請用耳朵猜歌！")
 
-# 播放 YouTube
-st.video(song["url"], start_time=0)
+# ====== 播放區（關鍵） ======
+if st.session_state.answered:
+    # 👉 公布答案後才顯示影片
+    st.video(song["url"], start_time=0)
+else:
+    # 👉 還沒公布時，不顯示畫面（但放一個提示）
+    st.write("（音樂播放中…）")
 
-# 提示
+# ====== 提示 ======
 if st.button("💡 顯示提示"):
     st.info(song.get("hint", "無提示"))
 
-# ====== 顯示答案 ======
-if st.button("👀 顯示答案") and not st.session_state.answered:
+# ====== 公布答案 ======
+if st.button("👀 公布答案") and not st.session_state.answered:
     st.session_state.answered = True
     st.success(f"答案是：{song['title']}")
+    st.rerun()
 
-# ====== 下一題（避免重複） ======
+# ====== 下一題 ======
 if st.button("➡️ 下一題"):
     remaining = list(set(range(len(songs))) - set(st.session_state.used_indices))
 

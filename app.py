@@ -30,9 +30,6 @@ if "current_index" not in st.session_state:
     st.session_state.current_index = random.randint(0, len(songs) - 1)
     st.session_state.used_indices.append(st.session_state.current_index)
 
-if "score" not in st.session_state:
-    st.session_state.score = 0
-
 if "question_count" not in st.session_state:
     st.session_state.question_count = 1
 
@@ -42,7 +39,6 @@ if "answered" not in st.session_state:
 # ====== UI ======
 st.title("🎵 猜歌挑戰")
 st.write(f"第 {st.session_state.question_count} 題")
-st.write(f"目前分數：{st.session_state.score}")
 
 song = songs[st.session_state.current_index]
 
@@ -53,21 +49,10 @@ st.video(song["url"], start_time=0)
 if st.button("💡 顯示提示"):
     st.info(song.get("hint", "無提示"))
 
-# 輸入答案
-answer = st.text_input("你的答案")
-
-# ====== 檢查答案 ======
-if st.button("✅ 確認答案") and not st.session_state.answered:
-    if not answer.strip():
-        st.warning("請輸入答案！")
-    else:
-        st.session_state.answered = True
-
-        if answer.strip().lower() == song["title"].lower():
-            st.success("🎉 答對了！")
-            st.session_state.score += 1
-        else:
-            st.error(f"❌ 錯了！答案是：{song['title']}")
+# ====== 顯示答案 ======
+if st.button("👀 顯示答案") and not st.session_state.answered:
+    st.session_state.answered = True
+    st.success(f"答案是：{song['title']}")
 
 # ====== 下一題（避免重複） ======
 if st.button("➡️ 下一題"):
@@ -83,15 +68,3 @@ if st.button("➡️ 下一題"):
         st.session_state.question_count += 1
         st.session_state.answered = False
         st.rerun()
-
-# ====== 重置 ======
-if st.button("🔄 重置遊戲"):
-    st.session_state.used_indices = []
-    st.session_state.current_index = random.randint(0, len(songs) - 1)
-    st.session_state.used_indices.append(st.session_state.current_index)
-
-    st.session_state.score = 0
-    st.session_state.question_count = 1
-    st.session_state.answered = False
-
-    st.rerun()

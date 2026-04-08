@@ -21,7 +21,7 @@ songs = load_songs()
 if not songs:
     st.stop()
 
-# ====== 初始化狀態 ======
+# ====== 初始化 ======
 if "used_indices" not in st.session_state:
     st.session_state.used_indices = []
 
@@ -41,13 +41,24 @@ song = songs[st.session_state.current_index]
 st.title("🎵 猜歌挑戰")
 st.write(f"第 {st.session_state.question_count} 題")
 
-# 盲猜階段：不顯示影片
+# ====== 按鍵播放音樂（影片畫面隱藏） ======
 if not st.session_state.answered:
-    st.info("🎧 盲猜階段，影片畫面隱藏（請自己記住或猜歌）")
+    play_btn = st.button("▶️ 播放音樂")
+    if play_btn:
+        # 使用 HTML iframe 嵌入 YouTube，隱藏畫面但可播放聲音
+        video_id = song["url"].split("v=")[-1]  # 取得 YouTube ID
+        youtube_embed = f"""
+        <iframe width="1" height="1"
+        src="https://www.youtube.com/embed/{video_id}?autoplay=1&controls=0&mute=0"
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen></iframe>
+        """
+        st.components.v1.html(youtube_embed, height=1)
 
-# 公布答案後顯示影片
+# ====== 公布答案後顯示影片 ======
 if st.session_state.answered:
-    st.video(song["url"], start_time=1)
+    st.video(song["url"], start_time=0)
 
 # ====== 提示 ======
 if st.button("💡 顯示提示"):
